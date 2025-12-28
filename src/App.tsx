@@ -3,11 +3,13 @@ import {type Crop, type PixelCrop} from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import ImageCrop from './components/ImageCrop';
 import ImageUploader from './components/ImageUploader';
+import ImageSlicer from './components/ImageSlicer';
 import {canvasPreview} from './utils/canvasPreview';
 import {useDebounceEffect} from './hooks/useDebounceEffect';
 import './App.css';
 
 function App() {
+  const [isPlaying, setIsPlaying] = useState(false);
   const [crop, setCrop] = useState<Crop | undefined>(undefined);
   const [originalImageUrl, setOriginalImageUrl] = useState('');
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
@@ -60,6 +62,8 @@ function App() {
       URL.revokeObjectURL(blobUrlRef.current);
     }
     blobUrlRef.current = URL.createObjectURL(blob);
+
+    setIsPlaying(true);
   }
 
   useDebounceEffect(
@@ -89,17 +93,23 @@ function App() {
   return (
     <div className="content">
       <h1>REINA PUZZLE</h1>
-      <ImageUploader onImageLoad={handleImageUpload} />
-      {!!originalImageUrl && (
-        <div ref={wrapperRef} className="image-crop-wrapper">
-          <ImageCrop
-            originalImageRef={originalImageRef}
-            src={originalImageUrl}
-            crop={crop}
-            setCrop={setCrop}
-            getCroppedImage={(c) => setCompletedCrop(c)}
-          />
-        </div>
+      {isPlaying && previewCanvasRef.current ? (
+        <ImageSlicer previewCanvasRef={previewCanvasRef} />
+      ) : (
+        <>
+          <ImageUploader onImageLoad={handleImageUpload} />
+          {!!originalImageUrl && (
+            <div ref={wrapperRef} className="image-crop-wrapper">
+              <ImageCrop
+                originalImageRef={originalImageRef}
+                src={originalImageUrl}
+                crop={crop}
+                setCrop={setCrop}
+                getCroppedImage={(c) => setCompletedCrop(c)}
+              />
+            </div>
+          )}
+        </>
       )}
       {!!completedCrop && (
         <>
@@ -111,12 +121,14 @@ function App() {
                 objectFit: 'contain',
                 width: completedCrop.width,
                 height: completedCrop.height,
+                visibility: isPlaying ? 'hidden' : 'visible',
               }}
             />
           </div>
-          {!!(crop && crop.x && crop.y && crop.width && crop.height) && (
-            <button onClick={onClickStart}>Start Game</button>
-          )}
+          {!isPlaying &&
+            !!(crop && crop.x && crop.y && crop.width && crop.height) && (
+              <button onClick={onClickStart}>Start Game</button>
+            )}
         </>
       )}
     </div>

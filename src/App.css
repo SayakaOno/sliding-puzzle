@@ -39,31 +39,17 @@
   align-items: center;
 }
 
-ul {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  width: 602px;
-  border: solid 1px black;
-  padding: 0;
-  box-sizing: border-box;
-  background-image: url('./assets/photo.JPG');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: right;
-}
-
-li {
-  border: solid 1px black;
-  width: 200px;
-  box-sizing: border-box;
-  height: 200px;
-}
-
-li:nth-child(1) {
-  background-color: #b53f9e;
-}
-
 .image-crop-wrapper {
   max-width: 350px;
+}
+
+.puzzle {
+  display: flex;
+  width: 500px;
+  flex-wrap: wrap;
+}
+
+.puzzle > * {
+  width: calc((100% - 6px) / 3);
+  border: solid 1px black;
 }
