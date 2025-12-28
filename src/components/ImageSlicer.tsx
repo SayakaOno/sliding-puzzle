@@ -66,6 +66,19 @@ export default function ImageSlicer({
     }
   }, [previewCanvasRef]);
 
+  const onPuzzleClick = (index: number) => {
+    setPieces((prev) => {
+      // TODO: prevent impossible moves
+
+      const newOrder = prev.slice();
+      const emptyIndex = prev.findIndex((piece) => !piece);
+      newOrder[emptyIndex] = pieces[index];
+      newOrder[index] = '';
+
+      return newOrder;
+    });
+  };
+
   return (
     <div className="imageSlicer">
       <canvas ref={canvasRef} style={{display: 'none'}} />
@@ -73,7 +86,14 @@ export default function ImageSlicer({
       <div className="puzzle">
         {pieces.map((piece, index) => {
           if (piece) {
-            return <img key={index} src={piece} alt={`Piece ${index + 1}`} />;
+            return (
+              <img
+                key={index}
+                src={piece}
+                alt={`Piece ${index + 1}`}
+                onClick={() => onPuzzleClick(index)}
+              />
+            );
           }
           return <div />;
         })}
