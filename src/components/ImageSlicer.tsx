@@ -1,6 +1,24 @@
 import {useEffect, useRef, useState, type RefObject} from 'react';
 import '../App.css';
 
+// [top, right, bottom, left]
+const GRIDS = {
+  0: [null, 1, 3, null],
+  1: [null, 2, 4, 0],
+  2: [null, null, 5, 1],
+  3: [0, 4, 6, null],
+  4: [1, 5, 7, 3],
+  5: [2, null, 8, 4],
+  6: [3, 7, null, null],
+  7: [4, 8, null, 6],
+  8: [5, null, null, 7],
+};
+
+const canMove = (index: keyof typeof GRIDS, emptyIndex: number) => {
+  const adjacentGrids = GRIDS[index];
+  return adjacentGrids.includes(emptyIndex);
+};
+
 export default function ImageSlicer({
   previewCanvasRef,
 }: {
@@ -66,12 +84,15 @@ export default function ImageSlicer({
     }
   }, [previewCanvasRef]);
 
-  const onPuzzleClick = (index: number) => {
+  const onPuzzleClick = (index: keyof typeof GRIDS) => {
     setPieces((prev) => {
-      // TODO: prevent impossible moves
+      const emptyIndex = prev.findIndex((piece) => !piece);
+
+      if (!canMove(index, emptyIndex)) {
+        return prev;
+      }
 
       const newOrder = prev.slice();
-      const emptyIndex = prev.findIndex((piece) => !piece);
       newOrder[emptyIndex] = pieces[index];
       newOrder[index] = '';
 
@@ -91,11 +112,11 @@ export default function ImageSlicer({
                 key={index}
                 src={piece}
                 alt={`Piece ${index + 1}`}
-                onClick={() => onPuzzleClick(index)}
+                onClick={() => onPuzzleClick(index as keyof typeof GRIDS)}
               />
             );
           }
-          return <div />;
+          return <div key={index} />;
         })}
       </div>
     </div>
