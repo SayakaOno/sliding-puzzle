@@ -24,8 +24,10 @@ export default function ImageSlicer({
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
 }) {
-  const [pieces, setPieces] = useState<string[]>([]);
+  const [order, setOrder] = useState<number[]>([]);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const slicedImagesRef = useRef<{url: string; id: number}[]>([]);
 
   const sliceImage = (img: HTMLCanvasElement) => {
     const rows = 3;
@@ -47,7 +49,8 @@ export default function ImageSlicer({
     canvas.width = pieceWidth;
     canvas.height = pieceHeight;
 
-    const newPieces: string[] = [];
+    const newPieces: {url: string; id: number}[] = [];
+    let id = 0;
 
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
@@ -71,11 +74,14 @@ export default function ImageSlicer({
           pieceDataUrl = canvas.toDataURL();
         }
 
-        newPieces.push(pieceDataUrl);
+        newPieces.push({url: pieceDataUrl, id});
+        id++;
       }
     }
 
-    setPieces(newPieces);
+    slicedImagesRef.current = newPieces;
+
+    setOrder(newPieces.map(({id}) => id));
   };
 
   useEffect(() => {
@@ -84,17 +90,17 @@ export default function ImageSlicer({
     }
   }, [previewCanvasRef]);
 
-  const onPuzzleClick = (index: keyof typeof GRIDS) => {
-    setPieces((prev) => {
-      const emptyIndex = prev.findIndex((piece) => !piece);
+  const onPuzzleClick = (index: keyof typeof GRIDS, imageId: number) => {
+    setOrder((prev) => {
+      const emptyIndex = prev.findIndex((id) => id === 0);
 
       if (!canMove(index, emptyIndex)) {
         return prev;
       }
 
       const newOrder = prev.slice();
-      newOrder[emptyIndex] = pieces[index];
-      newOrder[index] = '';
+      newOrder[emptyIndex] = imageId;
+      newOrder[index] = 0;
 
       return newOrder;
     });
@@ -105,18 +111,27 @@ export default function ImageSlicer({
       <canvas ref={canvasRef} style={{display: 'none'}} />
 
       <div className="puzzle">
-        {pieces.map((piece, index) => {
-          if (piece) {
+        {slicedImagesRef.current.map((image) => {
+          const location = order.findIndex((id) => id === image.id);
+          const cellStyle = {
+            top: `calc(${Math.floor(location / 3)} * 200px)`,
+            left: `calc(${location % 3} * 200px)`,
+          };
+
+          if (image.url) {
             return (
-              <img
-                key={index}
-                src={piece}
-                alt={`Piece ${index + 1}`}
-                onClick={() => onPuzzleClick(index as keyof typeof GRIDS)}
-              />
+              <button
+                key={image.id}
+                onClick={() =>
+                  onPuzzleClick(location as keyof typeof GRIDS, image.id)
+                }
+                style={cellStyle}
+              >
+                <img src={image.url} alt={`Piece ${image.id}`} width="100%" />
+              </button>
             );
           }
-          return <div key={index} />;
+          return <div key={0} style={cellStyle} />;
         })}
       </div>
     </div>

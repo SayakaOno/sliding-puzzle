@@ -44,12 +44,27 @@
 }
 
 .puzzle {
-  display: flex;
-  width: 500px;
-  flex-wrap: wrap;
+  position: relative;
+  width: 600px;
+  height: 600px;
+  border: solid 1px black;
 }
 
-.puzzle > * {
-  width: calc((100% - 6px) / 3);
+.puzzle > button,
+.puzzle > div {
+  box-sizing: border-box;
+  position: absolute;
+  width: calc(100% / 3);
+  height: calc(100% / 3);
   border: solid 1px black;
+}
+
+.puzzle > button {
+  border-radius: 0%;
+  padding: 0;
+  transition: top 200ms, left 200ms;
+}
+
+.puzzle > button:focus {
+  outline: none;
 }
