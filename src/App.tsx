@@ -92,7 +92,7 @@ function App() {
 
   return (
     <div className="content">
-      <h1>REINA PUZZLE</h1>
+      <h1>PERFECT PUZZLE</h1>
       {isPlaying && previewCanvasRef.current ? (
         <ImageSlicer previewCanvasRef={previewCanvasRef} />
       ) : (
