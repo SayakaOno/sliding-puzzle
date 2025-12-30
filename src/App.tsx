@@ -13,6 +13,7 @@ function App() {
   const [crop, setCrop] = useState<Crop | undefined>(undefined);
   const [originalImageUrl, setOriginalImageUrl] = useState('');
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
@@ -94,7 +95,10 @@ function App() {
     <div className="content">
       <h1>PERFECT PUZZLE</h1>
       {isPlaying && previewCanvasRef.current ? (
-        <ImageSlicer previewCanvasRef={previewCanvasRef} />
+        <ImageSlicer
+          previewCanvasRef={previewCanvasRef}
+          setIsCompleted={setIsCompleted}
+        />
       ) : (
         <>
           <ImageUploader onImageLoad={handleImageUpload} />
@@ -131,6 +135,7 @@ function App() {
             )}
         </>
       )}
+      {isCompleted && <p>Congratulations! You completed the puzzle!</p>}
     </div>
   );
 }

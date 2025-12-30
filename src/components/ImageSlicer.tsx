@@ -60,8 +60,10 @@ const shuffleOrder = (
 
 export default function ImageSlicer({
   previewCanvasRef,
+  setIsCompleted,
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
+  setIsCompleted: (isCompleted: boolean) => void;
 }) {
   const [order, setOrder] = useState<number[]>([]);
 
@@ -122,7 +124,7 @@ export default function ImageSlicer({
 
     const order = shuffleOrder(
       newPieces.map(({id}) => id),
-      newPieces.findIndex(({id}) => id === 0),
+      0,
       3
     );
 
@@ -136,6 +138,8 @@ export default function ImageSlicer({
   }, [previewCanvasRef]);
 
   const onPuzzleClick = (index: number, imageId: number) => {
+    let newOrder: number[] = [];
+
     setOrder((prev) => {
       const emptyIndex = prev.findIndex((id) => id === 0);
 
@@ -143,12 +147,20 @@ export default function ImageSlicer({
         return prev;
       }
 
-      const newOrder = prev.slice();
+      newOrder = prev.slice();
       newOrder[emptyIndex] = imageId;
       newOrder[index] = 0;
 
       return newOrder;
     });
+
+    const isCompleted = newOrder.every(
+      (id, index) => slicedImagesRef.current[index].id === id
+    );
+
+    if (isCompleted) {
+      setIsCompleted(true);
+    }
   };
 
   return (
