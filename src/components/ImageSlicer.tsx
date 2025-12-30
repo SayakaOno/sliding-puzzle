@@ -1,22 +1,61 @@
 import {useEffect, useRef, useState, type RefObject} from 'react';
 import '../App.css';
 
-// [top, right, bottom, left]
-const GRIDS = {
-  0: [null, 1, 3, null],
-  1: [null, 2, 4, 0],
-  2: [null, null, 5, 1],
-  3: [0, 4, 6, null],
-  4: [1, 5, 7, 3],
-  5: [2, null, 8, 4],
-  6: [3, 7, null, null],
-  7: [4, 8, null, 6],
-  8: [5, null, null, 7],
+const findUp = (cell: number, numOfCell: number) => {
+  return cell < numOfCell ? null : cell - numOfCell;
 };
 
-const canMove = (index: keyof typeof GRIDS, emptyIndex: number) => {
-  const adjacentGrids = GRIDS[index];
-  return adjacentGrids.includes(emptyIndex);
+const findLeft = (cell: number, numOfCell: number) => {
+  return cell % numOfCell ? cell - 1 : null;
+};
+
+const findRight = (cell: number, numOfCell: number) => {
+  return cell % numOfCell === numOfCell - 1 ? null : cell + 1;
+};
+
+const findBottom = (cell: number, numOfCell: number) => {
+  return cell / numOfCell >= numOfCell - 1 ? null : cell + numOfCell;
+};
+
+const canMove = (index: number, emptyIndex: number, numOfCell: number) => {
+  return [findLeft, findRight, findUp, findBottom].some((func) => {
+    const availableCell = func(index, numOfCell);
+
+    return availableCell === emptyIndex;
+  });
+};
+
+const getAvailableCells = (cell: number, numOfCell: number) => {
+  return [findLeft, findRight, findUp, findBottom].flatMap((func) => {
+    return func(cell, numOfCell) || [];
+  });
+};
+
+const pickRandomItem = (options: number[]) => {
+  const randomIndex = Math.floor(Math.random() * options.length);
+  return options[randomIndex];
+};
+
+const shuffleOrder = (
+  initialOrder: number[],
+  emptyIndex: number,
+  numOfCell: number,
+  count: number = 40
+) => {
+  const newOrder = initialOrder.slice();
+  let currentEmptyCellNumber = emptyIndex;
+
+  for (let i = 0; i < count; i++) {
+    const availableCells = getAvailableCells(currentEmptyCellNumber, numOfCell);
+    const pickedCell = pickRandomItem(availableCells);
+
+    newOrder[currentEmptyCellNumber] = newOrder[pickedCell];
+    newOrder[pickedCell] = 0;
+
+    currentEmptyCellNumber = pickedCell;
+  }
+
+  return newOrder;
 };
 
 export default function ImageSlicer({
@@ -81,7 +120,13 @@ export default function ImageSlicer({
 
     slicedImagesRef.current = newPieces;
 
-    setOrder(newPieces.map(({id}) => id));
+    const order = shuffleOrder(
+      newPieces.map(({id}) => id),
+      newPieces.findIndex(({id}) => id === 0),
+      3
+    );
+
+    setOrder(order);
   };
 
   useEffect(() => {
@@ -90,11 +135,11 @@ export default function ImageSlicer({
     }
   }, [previewCanvasRef]);
 
-  const onPuzzleClick = (index: keyof typeof GRIDS, imageId: number) => {
+  const onPuzzleClick = (index: number, imageId: number) => {
     setOrder((prev) => {
       const emptyIndex = prev.findIndex((id) => id === 0);
 
-      if (!canMove(index, emptyIndex)) {
+      if (!canMove(index, emptyIndex, 3)) {
         return prev;
       }
 
@@ -122,9 +167,7 @@ export default function ImageSlicer({
             return (
               <button
                 key={image.id}
-                onClick={() =>
-                  onPuzzleClick(location as keyof typeof GRIDS, image.id)
-                }
+                onClick={() => onPuzzleClick(location, image.id)}
                 style={cellStyle}
               >
                 <img src={image.url} alt={`Piece ${image.id}`} width="100%" />
