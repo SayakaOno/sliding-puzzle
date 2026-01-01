@@ -84,10 +84,12 @@
   color: #000;
 }
 
-.success-message h2{
-  margin: 0 0 8px 0;
+.success-message h2 {
+  margin: 0;
+  margin-bottom: 8px;
 }
 
 .success-message p {
   margin: 0;
+  margin-bottom: 12px;
 }

@@ -207,6 +207,14 @@ export default function ImageSlicer({
     }
   };
 
+  const handleRestart = () => {
+    setIsCompleted(false);
+    setIsSuccessModalOpen(false);
+    setOrder(shuffleOrder(correctOrderRef.current, 0, 3));
+    startTimeRef.current = null;
+    endTimeRef.current = null;
+  };
+
   return (
     <div className="imageSlicer">
       <canvas ref={canvasRef} style={{display: 'none'}} />
@@ -246,6 +254,7 @@ export default function ImageSlicer({
               {Math.round((endTimeRef.current - startTimeRef.current) / 1000)}{' '}
               seconds!
             </p>
+            <button onClick={handleRestart}>Restart</button>
           </div>
         </Modal>
       )}
