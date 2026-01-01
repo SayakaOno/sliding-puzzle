@@ -44,15 +44,19 @@ const shuffleOrder = (
 ) => {
   const newOrder = initialOrder.slice();
   let currentEmptyCellNumber = emptyIndex;
+  let movedCellNumber: number;
 
   for (let i = 0; i < count; i++) {
     const availableCells = getAvailableCells(currentEmptyCellNumber, numOfCell);
-    const pickedCell = pickRandomItem(availableCells);
+    const filteredAvailableCells = availableCells.filter(
+      (cell) => cell !== movedCellNumber
+    );
+    movedCellNumber = pickRandomItem(filteredAvailableCells);
 
-    newOrder[currentEmptyCellNumber] = newOrder[pickedCell];
-    newOrder[pickedCell] = 0;
+    newOrder[currentEmptyCellNumber] = newOrder[movedCellNumber];
+    newOrder[movedCellNumber] = 0;
 
-    currentEmptyCellNumber = pickedCell;
+    currentEmptyCellNumber = movedCellNumber;
   }
 
   return newOrder;
@@ -137,9 +141,21 @@ export default function ImageSlicer({
     }
   }, [previewCanvasRef]);
 
-  const onPuzzleClick = (index: number, imageId: number) => {
-    let newOrder: number[] = [];
+  useEffect(() => {
+    if (!order.length) {
+      return;
+    }
 
+    const isCompleted = order.every(
+      (id, index) => slicedImagesRef.current[index].id === id
+    );
+
+    if (isCompleted) {
+      setIsCompleted(true);
+    }
+  }, [order]);
+
+  const onPuzzleClick = (index: number, imageId: number) => {
     setOrder((prev) => {
       const emptyIndex = prev.findIndex((id) => id === 0);
 
@@ -147,20 +163,12 @@ export default function ImageSlicer({
         return prev;
       }
 
-      newOrder = prev.slice();
+      const newOrder = prev.slice();
       newOrder[emptyIndex] = imageId;
       newOrder[index] = 0;
 
       return newOrder;
     });
-
-    const isCompleted = newOrder.every(
-      (id, index) => slicedImagesRef.current[index].id === id
-    );
-
-    if (isCompleted) {
-      setIsCompleted(true);
-    }
   };
 
   return (
