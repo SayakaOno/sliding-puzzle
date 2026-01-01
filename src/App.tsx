@@ -1,11 +1,13 @@
 import {useRef, useState} from 'react';
 import {type Crop, type PixelCrop} from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import Particles from '@tsparticles/react';
 import ImageCrop from './components/ImageCrop';
 import ImageUploader from './components/ImageUploader';
 import ImageSlicer from './components/ImageSlicer';
 import {canvasPreview} from './utils/canvasPreview';
 import {useDebounceEffect} from './hooks/useDebounceEffect';
+import {PARTICLE_OPTIONS, useParticles} from './hooks/useParticles';
 import './App.css';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
   const originalImageRef = useRef<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const blobUrlRef = useRef('');
+
+  const isParticlesLoaded = useParticles();
 
   async function onClickStart() {
     const image = originalImageRef.current;
@@ -135,7 +139,9 @@ function App() {
             )}
         </>
       )}
-      {isCompleted && <p>Congratulations! You completed the puzzle!</p>}
+      {isCompleted && isParticlesLoaded && (
+        <Particles id="tsparticles" options={PARTICLE_OPTIONS} />
+      )}
     </div>
   );
 }
