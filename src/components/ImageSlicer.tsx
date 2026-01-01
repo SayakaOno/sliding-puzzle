@@ -17,12 +17,23 @@ const findBottom = (cell: number, numOfCell: number) => {
   return cell / numOfCell >= numOfCell - 1 ? null : cell + numOfCell;
 };
 
-const canMove = (index: number, emptyIndex: number, numOfCell: number) => {
-  return [findLeft, findRight, findUp, findBottom].some((func) => {
-    const availableCell = func(index, numOfCell);
+const isSameRow = (index: number, emptyIndex: number, numOfCell: number) => {
+  return Math.floor(index / numOfCell) === Math.floor(emptyIndex / numOfCell);
+};
 
-    return availableCell === emptyIndex;
-  });
+const isSameColumn = (index: number, emptyIndex: number, numOfCell: number) => {
+  return index % numOfCell === emptyIndex % numOfCell;
+};
+
+const isSameRowOrColumn = (
+  index: number,
+  emptyIndex: number,
+  numOfCell: number
+) => {
+  return (
+    isSameRow(index, emptyIndex, numOfCell) ||
+    isSameColumn(index, emptyIndex, numOfCell)
+  );
 };
 
 const getAvailableCells = (cell: number, numOfCell: number) => {
@@ -155,18 +166,29 @@ export default function ImageSlicer({
     }
   }, [order]);
 
-  const onPuzzleClick = (index: number, imageId: number) => {
+  const onPuzzleClick = (index: number, numOfCell: number) => {
     setOrder((prev) => {
       const emptyIndex = prev.findIndex((id) => id === 0);
 
-      if (!canMove(index, emptyIndex, 3)) {
+      if (!isSameRowOrColumn(index, emptyIndex, numOfCell)) {
         return prev;
       }
 
       const newOrder = prev.slice();
-      newOrder[emptyIndex] = imageId;
-      newOrder[index] = 0;
 
+      let step: number;
+
+      if (isSameRow(index, emptyIndex, numOfCell)) {
+        step = index < emptyIndex ? -1 : 1;
+      } else {
+        step = index < emptyIndex ? numOfCell * -1 : numOfCell;
+      }
+
+      for (let i = emptyIndex; i !== index; i += step) {
+        newOrder[i] = prev[i + step];
+      }
+
+      newOrder[index] = 0;
       return newOrder;
     });
   };
@@ -187,7 +209,7 @@ export default function ImageSlicer({
             return (
               <button
                 key={image.id}
-                onClick={() => onPuzzleClick(location, image.id)}
+                onClick={() => onPuzzleClick(location, 3)}
                 style={cellStyle}
               >
                 <img src={image.url} alt={`Piece ${image.id}`} width="100%" />
