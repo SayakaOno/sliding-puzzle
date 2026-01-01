@@ -75,10 +75,12 @@ const shuffleOrder = (
 
 export default function ImageSlicer({
   previewCanvasRef,
-  setIsCompleted,
+  handleStartGame,
+  handleGameComplete,
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
-  setIsCompleted: (isCompleted: boolean) => void;
+  handleStartGame: () => void;
+  handleGameComplete: () => void;
 }) {
   const [order, setOrder] = useState<number[]>([]);
 
@@ -162,11 +164,13 @@ export default function ImageSlicer({
     );
 
     if (isCompleted) {
-      setIsCompleted(true);
+      handleGameComplete();
     }
   }, [order]);
 
   const onPuzzleClick = (index: number, numOfCell: number) => {
+    handleStartGame();
+
     setOrder((prev) => {
       const emptyIndex = prev.findIndex((id) => id === 0);
 

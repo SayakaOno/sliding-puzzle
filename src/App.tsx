@@ -2,6 +2,7 @@ import {useRef, useState} from 'react';
 import {type Crop, type PixelCrop} from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import Particles from '@tsparticles/react';
+import Modal from 'react-modal';
 import ImageCrop from './components/ImageCrop';
 import ImageUploader from './components/ImageUploader';
 import ImageSlicer from './components/ImageSlicer';
@@ -16,11 +17,14 @@ function App() {
   const [originalImageUrl, setOriginalImageUrl] = useState('');
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const blobUrlRef = useRef('');
+  const startTimeRef = useRef<number | null>(null);
+  const endTimeRef = useRef<number | null>(null);
 
   const isParticlesLoaded = useParticles();
 
@@ -95,13 +99,29 @@ function App() {
     setOriginalImageUrl(imgSrc);
   };
 
+  const handleStartGame = () => {
+    if (!startTimeRef.current) {
+      startTimeRef.current = Date.now();
+    }
+  };
+
+  const handleGameComplete = () => {
+    setIsCompleted(true);
+    setIsSuccessModalOpen(true);
+
+    if (!endTimeRef.current) {
+      endTimeRef.current = Date.now();
+    }
+  };
+
   return (
     <div className="content">
       <h1>PERFECT PUZZLE</h1>
       {isPlaying && previewCanvasRef.current ? (
         <ImageSlicer
           previewCanvasRef={previewCanvasRef}
-          setIsCompleted={setIsCompleted}
+          handleStartGame={handleStartGame}
+          handleGameComplete={handleGameComplete}
         />
       ) : (
         <>
@@ -141,6 +161,22 @@ function App() {
       )}
       {isCompleted && isParticlesLoaded && (
         <Particles id="tsparticles" options={PARTICLE_OPTIONS} />
+      )}
+      {endTimeRef.current && startTimeRef.current && (
+        <Modal
+          className="success-modal"
+          isOpen={isSuccessModalOpen}
+          contentLabel="Success Modal"
+        >
+          <div className="success-message">
+            <h2>Congratulations!</h2>
+            <p>
+              You completed in{' '}
+              {Math.round((endTimeRef.current - startTimeRef.current) / 1000)}{' '}
+              seconds!
+            </p>
+          </div>
+        </Modal>
       )}
     </div>
   );
