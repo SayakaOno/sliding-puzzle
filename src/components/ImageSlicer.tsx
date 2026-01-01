@@ -1,4 +1,5 @@
 import {useEffect, useRef, useState, type RefObject} from 'react';
+import Modal from 'react-modal';
 import '../App.css';
 
 const findUp = (cell: number, numOfCell: number) => {
@@ -75,17 +76,19 @@ const shuffleOrder = (
 
 export default function ImageSlicer({
   previewCanvasRef,
-  handleStartGame,
-  handleGameComplete,
+  setIsCompleted,
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
-  handleStartGame: () => void;
-  handleGameComplete: () => void;
+  setIsCompleted: (isCompleted: boolean) => void;
 }) {
   const [order, setOrder] = useState<number[]>([]);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const slicedImagesRef = useRef<{url: string; id: number}[]>([]);
+  const correctOrderRef = useRef<number[]>([]);
+  const startTimeRef = useRef<number | null>(null);
+  const endTimeRef = useRef<number | null>(null);
 
   const sliceImage = (img: HTMLCanvasElement) => {
     const rows = 3;
@@ -138,12 +141,9 @@ export default function ImageSlicer({
     }
 
     slicedImagesRef.current = newPieces;
+    correctOrderRef.current = newPieces.map(({id}) => id);
 
-    const order = shuffleOrder(
-      newPieces.map(({id}) => id),
-      0,
-      3
-    );
+    const order = shuffleOrder(correctOrderRef.current, 0, 3);
 
     setOrder(order);
   };
@@ -164,7 +164,11 @@ export default function ImageSlicer({
     );
 
     if (isCompleted) {
-      handleGameComplete();
+      if (!endTimeRef.current) {
+        endTimeRef.current = Date.now();
+      }
+      setIsCompleted(true);
+      setIsSuccessModalOpen(true);
     }
   }, [order]);
 
@@ -197,6 +201,12 @@ export default function ImageSlicer({
     });
   };
 
+  const handleStartGame = () => {
+    if (!startTimeRef.current) {
+      startTimeRef.current = Date.now();
+    }
+  };
+
   return (
     <div className="imageSlicer">
       <canvas ref={canvasRef} style={{display: 'none'}} />
@@ -223,6 +233,22 @@ export default function ImageSlicer({
           return <div key={0} style={cellStyle} />;
         })}
       </div>
+      {endTimeRef.current && startTimeRef.current && (
+        <Modal
+          className="success-modal"
+          isOpen={isSuccessModalOpen}
+          contentLabel="Success Modal"
+        >
+          <div className="success-message">
+            <h2>Congratulations!</h2>
+            <p>
+              You completed in{' '}
+              {Math.round((endTimeRef.current - startTimeRef.current) / 1000)}{' '}
+              seconds!
+            </p>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
