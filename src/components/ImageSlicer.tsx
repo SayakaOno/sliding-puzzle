@@ -2,44 +2,44 @@ import {useEffect, useRef, useState, type RefObject} from 'react';
 import Modal from 'react-modal';
 import '../App.css';
 
-const findUp = (cell: number, numOfCell: number) => {
-  return cell < numOfCell ? null : cell - numOfCell;
+const findUp = (cell: number, gridSize: number) => {
+  return cell < gridSize ? null : cell - gridSize;
 };
 
-const findLeft = (cell: number, numOfCell: number) => {
-  return cell % numOfCell ? cell - 1 : null;
+const findLeft = (cell: number, gridSize: number) => {
+  return cell % gridSize ? cell - 1 : null;
 };
 
-const findRight = (cell: number, numOfCell: number) => {
-  return cell % numOfCell === numOfCell - 1 ? null : cell + 1;
+const findRight = (cell: number, gridSize: number) => {
+  return cell % gridSize === gridSize - 1 ? null : cell + 1;
 };
 
-const findBottom = (cell: number, numOfCell: number) => {
-  return cell / numOfCell >= numOfCell - 1 ? null : cell + numOfCell;
+const findBottom = (cell: number, gridSize: number) => {
+  return cell / gridSize >= gridSize - 1 ? null : cell + gridSize;
 };
 
-const isSameRow = (index: number, emptyIndex: number, numOfCell: number) => {
-  return Math.floor(index / numOfCell) === Math.floor(emptyIndex / numOfCell);
+const isSameRow = (index: number, emptyIndex: number, gridSize: number) => {
+  return Math.floor(index / gridSize) === Math.floor(emptyIndex / gridSize);
 };
 
-const isSameColumn = (index: number, emptyIndex: number, numOfCell: number) => {
-  return index % numOfCell === emptyIndex % numOfCell;
+const isSameColumn = (index: number, emptyIndex: number, gridSize: number) => {
+  return index % gridSize === emptyIndex % gridSize;
 };
 
 const isSameRowOrColumn = (
   index: number,
   emptyIndex: number,
-  numOfCell: number
+  gridSize: number
 ) => {
   return (
-    isSameRow(index, emptyIndex, numOfCell) ||
-    isSameColumn(index, emptyIndex, numOfCell)
+    isSameRow(index, emptyIndex, gridSize) ||
+    isSameColumn(index, emptyIndex, gridSize)
   );
 };
 
-const getAvailableCells = (cell: number, numOfCell: number) => {
+const getAvailableCells = (cell: number, gridSize: number) => {
   return [findLeft, findRight, findUp, findBottom].flatMap((func) => {
-    return func(cell, numOfCell) || [];
+    return func(cell, gridSize) || [];
   });
 };
 
@@ -51,7 +51,7 @@ const pickRandomItem = (options: number[]) => {
 const shuffleOrder = (
   initialOrder: number[],
   emptyIndex: number,
-  numOfCell: number,
+  gridSize: number,
   count: number = 40
 ) => {
   const newOrder = initialOrder.slice();
@@ -59,7 +59,7 @@ const shuffleOrder = (
   let movedCellNumber: number;
 
   for (let i = 0; i < count; i++) {
-    const availableCells = getAvailableCells(currentEmptyCellNumber, numOfCell);
+    const availableCells = getAvailableCells(currentEmptyCellNumber, gridSize);
     const filteredAvailableCells = availableCells.filter(
       (cell) => cell !== movedCellNumber
     );
@@ -77,9 +77,11 @@ const shuffleOrder = (
 export default function ImageSlicer({
   previewCanvasRef,
   setIsCompleted,
+  gridSize,
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
   setIsCompleted: (isCompleted: boolean) => void;
+  gridSize: number;
 }) {
   const [order, setOrder] = useState<number[]>([]);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -91,11 +93,8 @@ export default function ImageSlicer({
   const endTimeRef = useRef<number | null>(null);
 
   const sliceImage = (img: HTMLCanvasElement) => {
-    const rows = 3;
-    const cols = 3;
-
-    const pieceWidth = img.width / cols;
-    const pieceHeight = img.height / rows;
+    const pieceWidth = img.width / gridSize;
+    const pieceHeight = img.height / gridSize;
 
     const canvas = canvasRef.current;
     if (!canvas) {
@@ -113,8 +112,8 @@ export default function ImageSlicer({
     const newPieces: {url: string; id: number}[] = [];
     let id = 0;
 
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         let pieceDataUrl = '';
@@ -143,7 +142,7 @@ export default function ImageSlicer({
     slicedImagesRef.current = newPieces;
     correctOrderRef.current = newPieces.map(({id}) => id);
 
-    const order = shuffleOrder(correctOrderRef.current, 0, 3);
+    const order = shuffleOrder(correctOrderRef.current, 0, gridSize);
 
     setOrder(order);
   };
@@ -172,13 +171,13 @@ export default function ImageSlicer({
     }
   }, [order]);
 
-  const onPuzzleClick = (index: number, numOfCell: number) => {
+  const onPuzzleClick = (index: number) => {
     handleStartGame();
 
     setOrder((prev) => {
       const emptyIndex = prev.findIndex((id) => id === 0);
 
-      if (!isSameRowOrColumn(index, emptyIndex, numOfCell)) {
+      if (!isSameRowOrColumn(index, emptyIndex, gridSize)) {
         return prev;
       }
 
@@ -186,10 +185,10 @@ export default function ImageSlicer({
 
       let step: number;
 
-      if (isSameRow(index, emptyIndex, numOfCell)) {
+      if (isSameRow(index, emptyIndex, gridSize)) {
         step = index < emptyIndex ? -1 : 1;
       } else {
-        step = index < emptyIndex ? numOfCell * -1 : numOfCell;
+        step = index < emptyIndex ? gridSize * -1 : gridSize;
       }
 
       for (let i = emptyIndex; i !== index; i += step) {
@@ -210,7 +209,7 @@ export default function ImageSlicer({
   const handleRestart = () => {
     setIsCompleted(false);
     setIsSuccessModalOpen(false);
-    setOrder(shuffleOrder(correctOrderRef.current, 0, 3));
+    setOrder(shuffleOrder(correctOrderRef.current, 0, gridSize));
     startTimeRef.current = null;
     endTimeRef.current = null;
   };
@@ -223,15 +222,15 @@ export default function ImageSlicer({
         {slicedImagesRef.current.map((image) => {
           const location = order.findIndex((id) => id === image.id);
           const cellStyle = {
-            top: `calc(${Math.floor(location / 3)} * 200px)`,
-            left: `calc(${location % 3} * 200px)`,
+            top: `calc(${Math.floor(location / gridSize)} * 200px)`,
+            left: `calc(${location % gridSize} * 200px)`,
           };
 
           if (image.url) {
             return (
               <button
                 key={image.id}
-                onClick={() => onPuzzleClick(location, 3)}
+                onClick={() => onPuzzleClick(location, gridSize)}
                 style={cellStyle}
               >
                 <img src={image.url} alt={`Piece ${image.id}`} width="100%" />

@@ -11,6 +11,7 @@ import {PARTICLE_OPTIONS, useParticles} from './hooks/useParticles';
 import './App.css';
 
 function App() {
+  const [gridSize, setGridSize] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);
   const [crop, setCrop] = useState<Crop | undefined>(undefined);
   const [originalImageUrl, setOriginalImageUrl] = useState('');
@@ -102,6 +103,7 @@ function App() {
         <ImageSlicer
           previewCanvasRef={previewCanvasRef}
           setIsCompleted={setIsCompleted}
+          gridSize={gridSize}
         />
       ) : (
         <>
