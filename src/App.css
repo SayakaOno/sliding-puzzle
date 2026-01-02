@@ -65,9 +65,7 @@
 .puzzle > button,
 .puzzle > div {
   box-sizing: border-box;
-  position: absolute;
-  width: calc(100% / 3);
-  height: calc(100% / 3);
+  position: absolute; 
   border: solid 1px black;
 }
 

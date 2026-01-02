@@ -2,44 +2,53 @@ import {useEffect, useRef, useState, type RefObject} from 'react';
 import Modal from 'react-modal';
 import '../App.css';
 
-const findUp = (cell: number, gridSize: number) => {
-  return cell < gridSize ? null : cell - gridSize;
+const findUpTileIndex = (tileIndex: number, gridSize: number) => {
+  return tileIndex < gridSize ? null : tileIndex - gridSize;
 };
 
-const findLeft = (cell: number, gridSize: number) => {
-  return cell % gridSize ? cell - 1 : null;
+const findLeftTileIndex = (tileIndex: number, gridSize: number) => {
+  return tileIndex % gridSize ? tileIndex - 1 : null;
 };
 
-const findRight = (cell: number, gridSize: number) => {
-  return cell % gridSize === gridSize - 1 ? null : cell + 1;
+const findRightTileIndex = (tileIndex: number, gridSize: number) => {
+  return tileIndex % gridSize === gridSize - 1 ? null : tileIndex + 1;
 };
 
-const findBottom = (cell: number, gridSize: number) => {
-  return cell / gridSize >= gridSize - 1 ? null : cell + gridSize;
+const findBottomTileIndex = (tileIndex: number, gridSize: number) => {
+  return tileIndex / gridSize >= gridSize - 1 ? null : tileIndex + gridSize;
 };
 
-const isSameRow = (index: number, emptyIndex: number, gridSize: number) => {
-  return Math.floor(index / gridSize) === Math.floor(emptyIndex / gridSize);
+const isSameRow = (tileIndex: number, emptyIndex: number, gridSize: number) => {
+  return Math.floor(tileIndex / gridSize) === Math.floor(emptyIndex / gridSize);
 };
 
-const isSameColumn = (index: number, emptyIndex: number, gridSize: number) => {
-  return index % gridSize === emptyIndex % gridSize;
+const isSameColumn = (
+  tileIndex: number,
+  emptyIndex: number,
+  gridSize: number
+) => {
+  return tileIndex % gridSize === emptyIndex % gridSize;
 };
 
 const isSameRowOrColumn = (
-  index: number,
+  tileIndex: number,
   emptyIndex: number,
   gridSize: number
 ) => {
   return (
-    isSameRow(index, emptyIndex, gridSize) ||
-    isSameColumn(index, emptyIndex, gridSize)
+    isSameRow(tileIndex, emptyIndex, gridSize) ||
+    isSameColumn(tileIndex, emptyIndex, gridSize)
   );
 };
 
-const getAvailableCells = (cell: number, gridSize: number) => {
-  return [findLeft, findRight, findUp, findBottom].flatMap((func) => {
-    return func(cell, gridSize) || [];
+const getAvailableTiles = (tile: number, gridSize: number) => {
+  return [
+    findLeftTileIndex,
+    findRightTileIndex,
+    findUpTileIndex,
+    findBottomTileIndex,
+  ].flatMap((func) => {
+    return func(tile, gridSize) || [];
   });
 };
 
@@ -55,20 +64,20 @@ const shuffleOrder = (
   count: number = 40
 ) => {
   const newOrder = initialOrder.slice();
-  let currentEmptyCellNumber = emptyIndex;
-  let movedCellNumber: number;
+  let currentEmptyTileNumber = emptyIndex;
+  let movedTileNumber: number;
 
   for (let i = 0; i < count; i++) {
-    const availableCells = getAvailableCells(currentEmptyCellNumber, gridSize);
-    const filteredAvailableCells = availableCells.filter(
-      (cell) => cell !== movedCellNumber
+    const availableTiles = getAvailableTiles(currentEmptyTileNumber, gridSize);
+    const filteredAvailableTiles = availableTiles.filter(
+      (tile) => tile !== movedTileNumber
     );
-    movedCellNumber = pickRandomItem(filteredAvailableCells);
+    movedTileNumber = pickRandomItem(filteredAvailableTiles);
 
-    newOrder[currentEmptyCellNumber] = newOrder[movedCellNumber];
-    newOrder[movedCellNumber] = 0;
+    newOrder[currentEmptyTileNumber] = newOrder[movedTileNumber];
+    newOrder[movedTileNumber] = 0;
 
-    currentEmptyCellNumber = movedCellNumber;
+    currentEmptyTileNumber = movedTileNumber;
   }
 
   return newOrder;
@@ -171,13 +180,13 @@ export default function ImageSlicer({
     }
   }, [order]);
 
-  const onPuzzleClick = (index: number) => {
+  const onPuzzleClick = (tileIndex: number) => {
     handleStartGame();
 
     setOrder((prev) => {
       const emptyIndex = prev.findIndex((id) => id === 0);
 
-      if (!isSameRowOrColumn(index, emptyIndex, gridSize)) {
+      if (!isSameRowOrColumn(tileIndex, emptyIndex, gridSize)) {
         return prev;
       }
 
@@ -185,17 +194,17 @@ export default function ImageSlicer({
 
       let step: number;
 
-      if (isSameRow(index, emptyIndex, gridSize)) {
-        step = index < emptyIndex ? -1 : 1;
+      if (isSameRow(tileIndex, emptyIndex, gridSize)) {
+        step = tileIndex < emptyIndex ? -1 : 1;
       } else {
-        step = index < emptyIndex ? gridSize * -1 : gridSize;
+        step = tileIndex < emptyIndex ? gridSize * -1 : gridSize;
       }
 
-      for (let i = emptyIndex; i !== index; i += step) {
+      for (let i = emptyIndex; i !== tileIndex; i += step) {
         newOrder[i] = prev[i + step];
       }
 
-      newOrder[index] = 0;
+      newOrder[tileIndex] = 0;
       return newOrder;
     });
   };
@@ -220,24 +229,26 @@ export default function ImageSlicer({
 
       <div className="puzzle">
         {slicedImagesRef.current.map((image) => {
-          const location = order.findIndex((id) => id === image.id);
-          const cellStyle = {
-            top: `calc(${Math.floor(location / gridSize)} * 200px)`,
-            left: `calc(${location % gridSize} * 200px)`,
+          const tileIndex = order.findIndex((id) => id === image.id);
+          const tileStyle = {
+            top: `calc(${Math.floor(tileIndex / gridSize) / gridSize} * 100%)`,
+            left: `calc(${(tileIndex % gridSize) / gridSize} * 100%)`,
+            width: `calc(100% / ${gridSize})`,
+            height: `calc(100% / ${gridSize})`,
           };
 
           if (image.url) {
             return (
               <button
                 key={image.id}
-                onClick={() => onPuzzleClick(location, gridSize)}
-                style={cellStyle}
+                onClick={() => onPuzzleClick(tileIndex)}
+                style={tileStyle}
               >
                 <img src={image.url} alt={`Piece ${image.id}`} width="100%" />
               </button>
             );
           }
-          return <div key={0} style={cellStyle} />;
+          return <div key={0} style={tileStyle} />;
         })}
       </div>
       {endTimeRef.current && startTimeRef.current && (
