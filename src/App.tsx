@@ -1,4 +1,5 @@
 import {useRef, useState} from 'react';
+import Select from 'react-select';
 import {type Crop, type PixelCrop} from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import Particles from '@tsparticles/react';
@@ -9,6 +10,13 @@ import {canvasPreview} from './utils/canvasPreview';
 import {useDebounceEffect} from './hooks/useDebounceEffect';
 import {PARTICLE_OPTIONS, useParticles} from './hooks/useParticles';
 import './App.css';
+
+const gridSizeOptions = [
+  {value: 2, label: '2x2'},
+  {value: 3, label: '3x3'},
+  {value: 4, label: '4x4'},
+  {value: 5, label: '5x5'},
+];
 
 function App() {
   const [gridSize, setGridSize] = useState(3);
@@ -99,6 +107,17 @@ function App() {
   return (
     <div className="content">
       <h1>PERFECT PUZZLE</h1>
+      <Select
+        isDisabled={isPlaying}
+        options={gridSizeOptions}
+        defaultValue={gridSizeOptions[2]}
+        name="gridSize"
+        onChange={(option) => {
+          if (option) {
+            setGridSize(option.value);
+          }
+        }}
+      />
       {isPlaying && previewCanvasRef.current ? (
         <ImageSlicer
           previewCanvasRef={previewCanvasRef}
