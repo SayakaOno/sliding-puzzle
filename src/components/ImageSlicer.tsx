@@ -96,6 +96,7 @@ export default function ImageSlicer({
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const slicedImagesRef = useRef<{url: string; id: number}[]>([]);
   const correctOrderRef = useRef<number[]>([]);
   const startTimeRef = useRef<number | null>(null);
@@ -224,7 +225,7 @@ export default function ImageSlicer({
   };
 
   return (
-    <div className="imageSlicer">
+    <div ref={wrapperRef} className="imageSlicer">
       <canvas ref={canvasRef} style={{display: 'none'}} />
 
       <div className="puzzle">
@@ -256,6 +257,7 @@ export default function ImageSlicer({
           className="success-modal"
           isOpen={isSuccessModalOpen}
           contentLabel="Success Modal"
+          appElement={wrapperRef.current}
         >
           <div className="success-message">
             <h2>Congratulations!</h2>
