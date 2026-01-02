@@ -158,7 +158,6 @@ function App() {
                 objectFit: 'contain',
                 width: completedCrop.width,
                 height: completedCrop.height,
-                visibility: isPlaying ? 'hidden' : 'visible',
               }}
             />
           </div>
