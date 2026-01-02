@@ -110,8 +110,9 @@ function App() {
       <Select
         isDisabled={isPlaying}
         options={gridSizeOptions}
-        defaultValue={gridSizeOptions[2]}
+        defaultValue={gridSizeOptions[1]}
         name="gridSize"
+        value={gridSizeOptions.find((option) => option.value === gridSize)}
         onChange={(option) => {
           if (option) {
             setGridSize(option.value);
@@ -142,7 +143,14 @@ function App() {
       )}
       {!!completedCrop && (
         <>
-          <div>
+          <div className="preview-canvas-wrapper">
+            <div
+              className="empty-tile-indicator"
+              style={{
+                width: `calc(100% / ${gridSize}`,
+                height: `calc(100% / ${gridSize})`,
+              }}
+            />
             <canvas
               ref={previewCanvasRef}
               style={{
