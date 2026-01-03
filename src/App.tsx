@@ -116,6 +116,15 @@ function App() {
     <div ref={contentRef} className="content">
       <h1>PERFECT PUZZLE</h1>
       <Select
+        className="react-select-container"
+        theme={(theme) => ({
+          ...theme,
+          colors: {
+            ...theme.colors,
+            primary25: '#c99cffff',
+            primary: '#8a21c6ff',
+          },
+        })}
         isDisabled={isPlaying}
         options={gridSizeOptions}
         defaultValue={gridSizeOptions[1]}
