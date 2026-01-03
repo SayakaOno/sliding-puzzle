@@ -1,0 +1,30 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with pink to purple gradient -->
+  <circle cx="32" cy="32" r="32" fill="url(#gradient)"/>
+  
+  <!-- Gradient definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 3x3 Grid representing puzzle -->
+  <g transform="translate(16, 16)">
+    <!-- Row 1 -->
+    <rect x="0" y="0" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    <rect x="11" y="0" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    <rect x="22" y="0" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    
+    <!-- Row 2 -->
+    <rect x="0" y="11" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    <rect x="11" y="11" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    <rect x="22" y="11" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    
+    <!-- Row 3 - with missing tile (empty space) at bottom right -->
+    <rect x="0" y="22" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    <rect x="11" y="22" width="9" height="9" rx="1.5" fill="white" opacity="0.95"/>
+    <!-- Missing tile at position (2,2) to show it's a sliding puzzle -->
+  </g>
+</svg>
