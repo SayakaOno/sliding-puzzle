@@ -280,7 +280,7 @@ export default function ImageSlicer({
           className="success-modal"
           isOpen={isSuccessModalOpen}
           contentLabel="Success Modal"
-          appElement={wrapperRef.current}
+          appElement={wrapperRef.current || undefined}
         >
           <div className="success-message">
             <h2>Congratulations!</h2>
