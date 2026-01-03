@@ -11,12 +11,6 @@ export default function ImageUploader({onImageLoad}: ImageUploaderProps) {
       return;
     }
 
-    // TODO: Makes crop preview update between images?
-
-    // const img = new Image();
-    // img.src = URL.createObjectURL(file);
-    // img.onload = () => onImageLoad(img);
-
     const reader = new FileReader();
     reader.addEventListener('load', () =>
       onImageLoad(reader.result?.toString() || '')

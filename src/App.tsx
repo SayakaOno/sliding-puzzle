@@ -136,18 +136,21 @@ function App() {
           containerWidth={contentRef.current.clientWidth}
         />
       ) : (
-        <div>
+        <div className="image-uploader">
           <ImageUploader onImageLoad={handleImageUpload} />
           {!!originalImageUrl && (
-            <div ref={wrapperRef} className="image-crop-wrapper">
-              <ImageCrop
-                originalImageRef={originalImageRef}
-                src={originalImageUrl}
-                crop={crop}
-                setCrop={setCrop}
-                getCroppedImage={(c) => setCompletedCrop(c)}
-              />
-            </div>
+            <>
+              <p>Draw a square on the picture. That part will be used.</p>
+              <div ref={wrapperRef} className="image-crop-wrapper">
+                <ImageCrop
+                  originalImageRef={originalImageRef}
+                  src={originalImageUrl}
+                  crop={crop}
+                  setCrop={setCrop}
+                  getCroppedImage={(c) => setCompletedCrop(c)}
+                />
+              </div>
+            </>
           )}
         </div>
       )}
