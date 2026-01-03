@@ -127,17 +127,13 @@ function App() {
           }
         }}
       />
-      {isPlaying && previewCanvasRef.current ? (
+      {isPlaying && previewCanvasRef.current && contentRef.current ? (
         <ImageSlicer
           previewCanvasRef={previewCanvasRef}
           isCompleted={isCompleted}
           setIsCompleted={setIsCompleted}
           gridSize={gridSize}
-          puzzleSize={
-            contentRef.current
-              ? Math.min(Math.floor(contentRef.current?.clientWidth) - 40, 400)
-              : 300
-          }
+          containerWidth={contentRef.current.clientWidth}
         />
       ) : (
         <div>

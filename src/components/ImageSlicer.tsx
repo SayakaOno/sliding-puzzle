@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState, type RefObject} from 'react';
+import {useEffect, useMemo, useRef, useState, type RefObject} from 'react';
 import Modal from 'react-modal';
 import '../App.css';
 
@@ -88,13 +88,13 @@ export default function ImageSlicer({
   setIsCompleted,
   gridSize,
   isCompleted,
-  puzzleSize,
+  containerWidth,
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
   setIsCompleted: (isCompleted: boolean) => void;
   gridSize: number;
   isCompleted: boolean;
-  puzzleSize: number;
+  containerWidth: number;
 }) {
   const [order, setOrder] = useState<number[]>([]);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -105,6 +105,18 @@ export default function ImageSlicer({
   const correctOrderRef = useRef<number[]>([]);
   const startTimeRef = useRef<number | null>(null);
   const endTimeRef = useRef<number | null>(null);
+
+  const puzzleSize = useMemo(() => {
+    if (containerWidth >= 440) {
+      return 420;
+    }
+
+    let maxSize = Math.floor(containerWidth - 20);
+    while (maxSize % gridSize !== 0) {
+      maxSize--;
+    }
+    return maxSize;
+  }, [containerWidth]);
 
   const sliceImage = (img: HTMLCanvasElement) => {
     const pieceWidth = img.width / gridSize;
