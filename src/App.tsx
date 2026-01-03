@@ -129,6 +129,7 @@ function App() {
       {isPlaying && previewCanvasRef.current ? (
         <ImageSlicer
           previewCanvasRef={previewCanvasRef}
+          isCompleted={isCompleted}
           setIsCompleted={setIsCompleted}
           gridSize={gridSize}
         />

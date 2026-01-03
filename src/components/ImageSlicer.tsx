@@ -87,10 +87,12 @@ export default function ImageSlicer({
   previewCanvasRef,
   setIsCompleted,
   gridSize,
+  isCompleted,
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
   setIsCompleted: (isCompleted: boolean) => void;
   gridSize: number;
+  isCompleted: boolean;
 }) {
   const [order, setOrder] = useState<number[]>([]);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -177,11 +179,18 @@ export default function ImageSlicer({
         endTimeRef.current = Date.now();
       }
       setIsCompleted(true);
-      setIsSuccessModalOpen(true);
+
+      setTimeout(() => {
+        setIsSuccessModalOpen(true);
+      }, 1000);
     }
   }, [order]);
 
   const onPuzzleClick = (tileIndex: number) => {
+    if (isCompleted) {
+      return;
+    }
+
     handleStartGame();
 
     setOrder((prev) => {
