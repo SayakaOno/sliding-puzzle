@@ -88,11 +88,13 @@ export default function ImageSlicer({
   setIsCompleted,
   gridSize,
   isCompleted,
+  puzzleSize,
 }: {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
   setIsCompleted: (isCompleted: boolean) => void;
   gridSize: number;
   isCompleted: boolean;
+  puzzleSize: number;
 }) {
   const [order, setOrder] = useState<number[]>([]);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -237,7 +239,7 @@ export default function ImageSlicer({
     <div ref={wrapperRef}>
       <canvas ref={canvasRef} style={{display: 'none'}} />
 
-      <div className="puzzle">
+      <div className="puzzle" style={{width: puzzleSize, height: puzzleSize}}>
         {slicedImagesRef.current.map((image) => {
           const tileIndex = order.findIndex((id) => id === image.id);
           const tileStyle = {

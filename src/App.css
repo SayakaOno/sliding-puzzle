@@ -31,8 +31,6 @@
 .puzzle {
   position: relative;
   border: solid 1px black;
-  width: 400px;
-  height: 400px;
 }
 
 .puzzle > button,

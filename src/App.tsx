@@ -33,6 +33,7 @@ function App() {
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [isCompleted, setIsCompleted] = useState(false);
 
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -112,7 +113,7 @@ function App() {
   };
 
   return (
-    <div className="content">
+    <div ref={contentRef} className="content">
       <h1>PERFECT PUZZLE</h1>
       <Select
         isDisabled={isPlaying}
@@ -132,6 +133,11 @@ function App() {
           isCompleted={isCompleted}
           setIsCompleted={setIsCompleted}
           gridSize={gridSize}
+          puzzleSize={
+            contentRef.current
+              ? Math.min(Math.floor(contentRef.current?.clientWidth) - 40, 400)
+              : 300
+          }
         />
       ) : (
         <div>
