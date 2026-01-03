@@ -16,6 +16,13 @@ const gridSizeOptions = [
   {value: 3, label: '3x3'},
   {value: 4, label: '4x4'},
   {value: 5, label: '5x5'},
+  {value: 6, label: '6x6'},
+  {value: 7, label: '7x7'},
+  {value: 8, label: '8x8'},
+  {value: 9, label: '9x9'},
+  {value: 10, label: '10x10'},
+  {value: 11, label: '11x11'},
+  {value: 12, label: '12x12'},
 ];
 
 function App() {
@@ -126,7 +133,7 @@ function App() {
           gridSize={gridSize}
         />
       ) : (
-        <>
+        <div>
           <ImageUploader onImageLoad={handleImageUpload} />
           {!!originalImageUrl && (
             <div ref={wrapperRef} className="image-crop-wrapper">
@@ -139,34 +146,31 @@ function App() {
               />
             </div>
           )}
-        </>
+        </div>
       )}
       {!!completedCrop && (
-        <>
-          <div className="preview-canvas-wrapper">
-            <div
-              className="empty-tile-indicator"
-              style={{
-                width: `calc(100% / ${gridSize}`,
-                height: `calc(100% / ${gridSize})`,
-              }}
-            />
-            <canvas
-              ref={previewCanvasRef}
-              style={{
-                border: '1px solid black',
-                objectFit: 'contain',
-                width: completedCrop.width,
-                height: completedCrop.height,
-              }}
-            />
-          </div>
-          {!isPlaying &&
-            !!(crop && crop.x && crop.y && crop.width && crop.height) && (
-              <button onClick={onClickStart}>Start Game</button>
-            )}
-        </>
+        <div className="preview-canvas-wrapper">
+          <div
+            className="empty-tile-indicator"
+            style={{
+              width: `calc(100% / ${gridSize}`,
+              height: `calc(100% / ${gridSize})`,
+            }}
+          />
+          <canvas
+            className="preview-canvas"
+            ref={previewCanvasRef}
+            style={{
+              width: completedCrop.width,
+              height: completedCrop.height,
+            }}
+          />
+        </div>
       )}
+      {!isPlaying &&
+        !!(crop && crop.x && crop.y && crop.width && crop.height) && (
+          <button onClick={onClickStart}>Start Game</button>
+        )}
       {isCompleted && isParticlesLoaded && (
         <Particles id="tsparticles" options={PARTICLE_OPTIONS} />
       )}

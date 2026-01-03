@@ -225,7 +225,7 @@ export default function ImageSlicer({
   };
 
   return (
-    <div ref={wrapperRef} className="imageSlicer">
+    <div ref={wrapperRef}>
       <canvas ref={canvasRef} style={{display: 'none'}} />
 
       <div className="puzzle">
