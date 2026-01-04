@@ -180,14 +180,7 @@ function App() {
               height: `calc(100% / ${gridSize})`,
             }}
           />
-          <canvas
-            className="preview-canvas"
-            ref={previewCanvasRef}
-            style={{
-              width: completedCrop.width,
-              height: completedCrop.height,
-            }}
-          />
+          <canvas ref={previewCanvasRef} />
         </div>
       )}
       {!isPlaying && canStartGameRef.current && (
