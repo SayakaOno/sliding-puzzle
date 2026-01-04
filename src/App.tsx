@@ -20,6 +20,9 @@ const gridSizeOptions = [
   {value: 12, label: '12x12'},
 ];
 
+// Canvas cropping logic adapted from the React Image Crop demo:
+// https://codesandbox.io/p/sandbox/react-image-crop-demo-with-react-hooks-y831o?file=%2Fsrc%2FApp.tsx%3A221%2C30-221%2C49
+
 function App() {
   const [gridSize, setGridSize] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);

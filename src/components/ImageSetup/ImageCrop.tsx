@@ -1,3 +1,6 @@
+// Adapted from the React Image Crop CodeSandbox demo:
+// https://codesandbox.io/p/sandbox/react-image-crop-demo-with-react-hooks-y831o?file=%2Fsrc%2FimgPreview.ts
+
 import type {Ref} from 'react';
 import ReactCrop, {
   type Crop,

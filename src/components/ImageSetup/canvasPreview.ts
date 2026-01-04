@@ -1,3 +1,5 @@
+// Copied from the React Image Crop CodeSandbox demo:
+// https://codesandbox.io/p/sandbox/react-image-crop-demo-with-react-hooks-y831o?file=%2Fsrc%2FcanvasPreview.ts%3A10%2C14
 import { type PixelCrop } from 'react-image-crop'
 
 const TO_RADIANS = Math.PI / 180
