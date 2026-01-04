@@ -21,6 +21,11 @@
   outline: none;
 }
 
+.board > button > img {
+  user-select: none; /* prevents selection highlight on the image */
+}
+
+
 /* GameSuccessView */
 .success-modal {
   height: 100vh;
