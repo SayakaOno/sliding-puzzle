@@ -37,6 +37,7 @@ function App() {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const canStartGameRef = useRef(false);
   const blobUrlRef = useRef('');
 
   const isParticlesLoaded = useParticles();
@@ -112,6 +113,12 @@ function App() {
     setOriginalImageUrl(imgSrc);
   };
 
+  const onDragEnd = () => {
+    if (!canStartGameRef.current) {
+      canStartGameRef.current = true;
+    }
+  };
+
   return (
     <div ref={contentRef} className="content">
       <h1>PERFECT PUZZLE</h1>
@@ -157,13 +164,14 @@ function App() {
                   crop={crop}
                   setCrop={setCrop}
                   getCroppedImage={(c) => setCompletedCrop(c)}
+                  onDragEnd={onDragEnd}
                 />
               </div>
             </>
           )}
         </div>
       )}
-      {!!completedCrop && (
+      {canStartGameRef.current && !!completedCrop && (
         <div className="preview-canvas-wrapper">
           <div
             className="empty-tile-indicator"
@@ -182,10 +190,9 @@ function App() {
           />
         </div>
       )}
-      {!isPlaying &&
-        !!(crop && crop.x && crop.y && crop.width && crop.height) && (
-          <button onClick={onClickStart}>Start Game</button>
-        )}
+      {!isPlaying && canStartGameRef.current && (
+        <button onClick={onClickStart}>Start Game</button>
+      )}
       {isCompleted && isParticlesLoaded && (
         <Particles id="tsparticles" options={PARTICLE_OPTIONS} />
       )}
