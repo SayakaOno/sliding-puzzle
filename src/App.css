@@ -17,27 +17,6 @@
   width: 200px;
 }
 
-.image-uploader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.image-uploader input {
-  margin-bottom: 8px;
-}
-
-.image-uploader p {
-  margin: 0;
-  color: white;
-}
-
-.image-crop-wrapper {
-  max-width: 350px;
-  margin-bottom: 4px;
-}
-
 .preview-canvas-wrapper {
   position: relative;
 }
@@ -54,53 +33,4 @@
   left: 0; 
   border: solid 1px #1a1a1a;
   background-color: rgba(0, 0, 0, 0.7);
-}
-
-.puzzle {
-  position: relative;
-  border: solid 1px #1a1a1a;
-  margin-bottom: 12px;
-}
-
-.puzzle > button,
-.puzzle > div {
-  box-sizing: border-box;
-  position: absolute; 
-  border: solid 1px #1a1a1a;
-}
-
-.puzzle > button {
-  border-radius: 0%;
-  padding: 0;
-  transition: top 200ms, left 200ms;
-}
-
-.puzzle > button:focus {
-  outline: none;
-}
-
-.success-modal {
-  height: 100vh;
-  display: flex; 
-  align-items: center;
-  justify-content: center;
-  margin-top: -40px;
-}
-
-.success-message {
-  padding: 16px 20px 20px 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  color: #000;
-}
-
-.success-message h2 {
-  margin: 0;
-  margin-bottom: 8px;
-}
-
-.success-message p {
-  margin: 0;
-  margin-bottom: 12px;
 }

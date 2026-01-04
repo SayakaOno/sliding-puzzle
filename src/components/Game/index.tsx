@@ -1,112 +1,33 @@
 import {useEffect, useMemo, useRef, useState, type RefObject} from 'react';
-import Modal from 'react-modal';
-import '../App.css';
+import {isSameRow, isSameRowOrColumn, shuffleOrder} from './utils';
+import GameSuccessView from './GameSuccessView';
+import './index.css';
 
-const findUpTileIndex = (tileIndex: number, gridSize: number) => {
-  return tileIndex < gridSize ? null : tileIndex - gridSize;
-};
-
-const findLeftTileIndex = (tileIndex: number, gridSize: number) => {
-  return tileIndex % gridSize ? tileIndex - 1 : null;
-};
-
-const findRightTileIndex = (tileIndex: number, gridSize: number) => {
-  return tileIndex % gridSize === gridSize - 1 ? null : tileIndex + 1;
-};
-
-const findBottomTileIndex = (tileIndex: number, gridSize: number) => {
-  return tileIndex / gridSize >= gridSize - 1 ? null : tileIndex + gridSize;
-};
-
-const isSameRow = (tileIndex: number, emptyIndex: number, gridSize: number) => {
-  return Math.floor(tileIndex / gridSize) === Math.floor(emptyIndex / gridSize);
-};
-
-const isSameColumn = (
-  tileIndex: number,
-  emptyIndex: number,
-  gridSize: number
-) => {
-  return tileIndex % gridSize === emptyIndex % gridSize;
-};
-
-const isSameRowOrColumn = (
-  tileIndex: number,
-  emptyIndex: number,
-  gridSize: number
-) => {
-  return (
-    isSameRow(tileIndex, emptyIndex, gridSize) ||
-    isSameColumn(tileIndex, emptyIndex, gridSize)
-  );
-};
-
-const getAvailableTiles = (tile: number, gridSize: number) => {
-  return [
-    findLeftTileIndex,
-    findRightTileIndex,
-    findUpTileIndex,
-    findBottomTileIndex,
-  ].flatMap((func) => {
-    return func(tile, gridSize) || [];
-  });
-};
-
-const pickRandomItem = (options: number[]) => {
-  const randomIndex = Math.floor(Math.random() * options.length);
-  return options[randomIndex];
-};
-
-const shuffleOrder = (
-  initialOrder: number[],
-  emptyIndex: number,
-  gridSize: number,
-  count: number = 40
-) => {
-  const newOrder = initialOrder.slice();
-  let currentEmptyTileNumber = emptyIndex;
-  let movedTileNumber: number;
-
-  for (let i = 0; i < count; i++) {
-    const availableTiles = getAvailableTiles(currentEmptyTileNumber, gridSize);
-    const filteredAvailableTiles = availableTiles.filter(
-      (tile) => tile !== movedTileNumber
-    );
-    movedTileNumber = pickRandomItem(filteredAvailableTiles);
-
-    newOrder[currentEmptyTileNumber] = newOrder[movedTileNumber];
-    newOrder[movedTileNumber] = 0;
-
-    currentEmptyTileNumber = movedTileNumber;
-  }
-
-  return newOrder;
-};
-
-export default function ImageSlicer({
-  previewCanvasRef,
-  setIsCompleted,
-  gridSize,
-  isCompleted,
-  containerWidth,
-}: {
+interface GameProps {
   previewCanvasRef: RefObject<HTMLCanvasElement | null>;
   setIsCompleted: (isCompleted: boolean) => void;
   gridSize: number;
   isCompleted: boolean;
   containerWidth: number;
-}) {
+}
+
+export default function Game({
+  previewCanvasRef,
+  setIsCompleted,
+  gridSize,
+  isCompleted,
+  containerWidth,
+}: GameProps) {
   const [order, setOrder] = useState<number[]>([]);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [timer, setTimer] = useState<number | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const slicedImagesRef = useRef<{url: string; id: number}[]>([]);
   const correctOrderRef = useRef<number[]>([]);
   const startTimeRef = useRef<number | null>(null);
-  const endTimeRef = useRef<number | null>(null);
 
-  const puzzleSize = useMemo(() => {
+  const boardSize = useMemo(() => {
     if (containerWidth >= 440) {
       return 420;
     }
@@ -189,18 +110,16 @@ export default function ImageSlicer({
     );
 
     if (isCompleted) {
-      if (!endTimeRef.current) {
-        endTimeRef.current = Date.now();
-      }
+      const endTime = Date.now();
       setIsCompleted(true);
 
       setTimeout(() => {
-        setIsSuccessModalOpen(true);
+        setTimer(endTime - startTimeRef.current!);
       }, 1000);
     }
   }, [order]);
 
-  const onPuzzleClick = (tileIndex: number) => {
+  const onTileClick = (tileIndex: number) => {
     if (isCompleted) {
       return;
     }
@@ -241,17 +160,14 @@ export default function ImageSlicer({
 
   const handleRestart = () => {
     setIsCompleted(false);
-    setIsSuccessModalOpen(false);
+    setTimer(null);
     setOrder(shuffleOrder(correctOrderRef.current, 0, gridSize));
     startTimeRef.current = null;
-    endTimeRef.current = null;
   };
 
   return (
     <div ref={wrapperRef}>
-      <canvas ref={canvasRef} style={{display: 'none'}} />
-
-      <div className="puzzle" style={{width: puzzleSize, height: puzzleSize}}>
+      <div className="board" style={{width: boardSize, height: boardSize}}>
         {slicedImagesRef.current.map((image) => {
           const tileIndex = order.findIndex((id) => id === image.id);
           const tileStyle = {
@@ -265,7 +181,7 @@ export default function ImageSlicer({
             return (
               <button
                 key={image.id}
-                onClick={() => onPuzzleClick(tileIndex)}
+                onClick={() => onTileClick(tileIndex)}
                 style={tileStyle}
               >
                 <img src={image.url} alt={`Piece ${image.id}`} width="100%" />
@@ -275,23 +191,13 @@ export default function ImageSlicer({
           return <div key={0} style={tileStyle} />;
         })}
       </div>
-      {endTimeRef.current && startTimeRef.current && (
-        <Modal
-          className="success-modal"
-          isOpen={isSuccessModalOpen}
-          contentLabel="Success Modal"
-          appElement={wrapperRef.current || undefined}
-        >
-          <div className="success-message">
-            <h2>Congratulations!</h2>
-            <p>
-              You completed in{' '}
-              {Math.round((endTimeRef.current - startTimeRef.current) / 1000)}{' '}
-              seconds!
-            </p>
-            <button onClick={handleRestart}>Restart</button>
-          </div>
-        </Modal>
+      <canvas ref={canvasRef} style={{display: 'none'}} />
+      {isCompleted && (
+        <GameSuccessView
+          timer={timer}
+          contentRef={wrapperRef}
+          handleRestart={handleRestart}
+        />
       )}
     </div>
   );

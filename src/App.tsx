@@ -1,14 +1,9 @@
 import {useRef, useState} from 'react';
 import Select from 'react-select';
-import {type Crop, type PixelCrop} from 'react-image-crop';
+import {type PixelCrop} from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import Particles from '@tsparticles/react';
-import ImageCrop from './components/ImageCrop';
-import ImageUploader from './components/ImageUploader';
-import ImageSlicer from './components/ImageSlicer';
-import {canvasPreview} from './utils/canvasPreview';
-import {useDebounceEffect} from './hooks/useDebounceEffect';
-import {PARTICLE_OPTIONS, useParticles} from './hooks/useParticles';
+import Game from './components/Game';
+import ImageSetup from './components/ImageSetup';
 import './App.css';
 
 const gridSizeOptions = [
@@ -28,23 +23,25 @@ const gridSizeOptions = [
 function App() {
   const [gridSize, setGridSize] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [crop, setCrop] = useState<Crop | undefined>(undefined);
-  const [originalImageUrl, setOriginalImageUrl] = useState('');
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [isCompleted, setIsCompleted] = useState(false);
 
   const contentRef = useRef<HTMLDivElement | null>(null);
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const originalImageRef = useRef<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const canStartGameRef = useRef(false);
   const blobUrlRef = useRef('');
 
-  const isParticlesLoaded = useParticles();
+  const setCanStartGame = () => {
+    if (!canStartGameRef.current) {
+      canStartGameRef.current = true;
+    }
+  };
 
   async function onClickStart() {
     const image = originalImageRef.current;
     const previewCanvas = previewCanvasRef.current;
+
     if (!image || !previewCanvas || !completedCrop) {
       throw new Error('Crop canvas does not exist');
     }
@@ -89,36 +86,6 @@ function App() {
     setIsPlaying(true);
   }
 
-  useDebounceEffect(
-    async () => {
-      if (
-        completedCrop?.width &&
-        completedCrop?.height &&
-        originalImageRef.current &&
-        previewCanvasRef.current
-      ) {
-        // We use canvasPreview as it's much faster than imgPreview.
-        canvasPreview(
-          originalImageRef.current,
-          previewCanvasRef.current,
-          completedCrop
-        );
-      }
-    },
-    100,
-    [completedCrop]
-  );
-
-  const handleImageUpload = (imgSrc: string) => {
-    setOriginalImageUrl(imgSrc);
-  };
-
-  const onDragEnd = () => {
-    if (!canStartGameRef.current) {
-      canStartGameRef.current = true;
-    }
-  };
-
   return (
     <div ref={contentRef} className="content">
       <h1>PERFECT PUZZLE</h1>
@@ -143,8 +110,8 @@ function App() {
           }
         }}
       />
-      {isPlaying && previewCanvasRef.current && contentRef.current ? (
-        <ImageSlicer
+      {isPlaying && contentRef.current ? (
+        <Game
           previewCanvasRef={previewCanvasRef}
           isCompleted={isCompleted}
           setIsCompleted={setIsCompleted}
@@ -152,42 +119,28 @@ function App() {
           containerWidth={contentRef.current.clientWidth}
         />
       ) : (
-        <div className="image-uploader">
-          <ImageUploader onImageLoad={handleImageUpload} />
-          {!!originalImageUrl && (
-            <>
-              <p>Draw a square on the picture. That part will be used.</p>
-              <div ref={wrapperRef} className="image-crop-wrapper">
-                <ImageCrop
-                  originalImageRef={originalImageRef}
-                  src={originalImageUrl}
-                  crop={crop}
-                  setCrop={setCrop}
-                  getCroppedImage={(c) => setCompletedCrop(c)}
-                  onDragEnd={onDragEnd}
-                />
-              </div>
-            </>
-          )}
-        </div>
+        <ImageSetup
+          previewCanvasRef={previewCanvasRef}
+          completedCrop={completedCrop}
+          setCompletedCrop={setCompletedCrop}
+          setCanStartGame={setCanStartGame}
+          originalImageRef={originalImageRef}
+        />
       )}
-      {canStartGameRef.current && !!completedCrop && (
-        <div className="preview-canvas-wrapper">
-          <div
-            className="empty-tile-indicator"
-            style={{
-              width: `calc(100% / ${gridSize}`,
-              height: `calc(100% / ${gridSize})`,
-            }}
-          />
-          <canvas ref={previewCanvasRef} />
-        </div>
-      )}
-      {!isPlaying && canStartGameRef.current && (
-        <button onClick={onClickStart}>Start Game</button>
-      )}
-      {isCompleted && isParticlesLoaded && (
-        <Particles id="tsparticles" options={PARTICLE_OPTIONS} />
+      {canStartGameRef.current && (
+        <>
+          <div className="preview-canvas-wrapper">
+            <div
+              className="empty-tile-indicator"
+              style={{
+                width: `calc(100% / ${gridSize}`,
+                height: `calc(100% / ${gridSize})`,
+              }}
+            />
+            <canvas ref={previewCanvasRef} />
+          </div>
+          {!isPlaying && <button onClick={onClickStart}>Start Game</button>}
+        </>
       )}
     </div>
   );
