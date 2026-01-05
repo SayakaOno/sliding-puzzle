@@ -39,9 +39,9 @@ export default function Game({
     return maxSize;
   }, [containerWidth]);
 
-  const sliceImage = (img: HTMLCanvasElement) => {
-    const pieceWidth = img.width / gridSize;
-    const pieceHeight = img.height / gridSize;
+  const sliceImage = () => {
+    const pieceWidth = previewCanvasRef.current!.width / gridSize;
+    const pieceHeight = previewCanvasRef.current!.height / gridSize;
 
     const canvas = canvasRef.current;
     if (!canvas) {
@@ -67,7 +67,7 @@ export default function Game({
 
         if (y || x) {
           ctx.drawImage(
-            img,
+            previewCanvasRef.current!,
             x * pieceWidth,
             y * pieceHeight,
             pieceWidth,
@@ -96,7 +96,7 @@ export default function Game({
 
   useEffect(() => {
     if (previewCanvasRef.current) {
-      sliceImage(previewCanvasRef.current);
+      sliceImage();
     }
   }, [previewCanvasRef]);
 
