@@ -61,13 +61,14 @@ export const shuffleOrder = (
   initialOrder: number[],
   emptyIndex: number,
   gridSize: number,
-  count: number = 40,
+  count: number = gridSize * gridSize,
 ) => {
   const newOrder = initialOrder.slice()
   let currentEmptyTileNumber = emptyIndex
   let movedTileNumber: number
+  let counter = 0
 
-  for (let i = 0; i < count; i++) {
+  do {
     const availableTiles = getAvailableTiles(currentEmptyTileNumber, gridSize)
     const filteredAvailableTiles = availableTiles.filter(
       (tile) => tile !== movedTileNumber,
@@ -78,7 +79,11 @@ export const shuffleOrder = (
     newOrder[movedTileNumber] = 0
 
     currentEmptyTileNumber = movedTileNumber
-  }
+    counter++
+  } while (
+    counter < count ||
+    newOrder.some((id, index) => id === initialOrder[index])
+  )
 
   return newOrder
 }
