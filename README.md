@@ -6,7 +6,7 @@ A sliding-puzzle web app built with React + TypeScript and Vite. Upload any imag
 
 Recording (screen capture):
 
-https://github.com/user-attachments/assets/c6f24019-5d74-4f9c-9818-4100ba8876e6
+https://github.com/user-attachments/assets/31ffb298-0e5c-46fd-b557-308a92e66a4f
 
 Live demo: https://sayakaono.github.io/sliding-puzzle/
 
@@ -91,7 +91,8 @@ Key dependencies
 
 ## Acknowledgements
 
-Dedicated to my niece — she supplied the ideas and the colour palette ❤️
+Dedicated to my niece — she supplied the ideas and the colour palette, which really helped.<br />
+Thank you, Reina — it was so much fun building the app with you 🫶❤️
 
 - react-image-crop demo for canvas/cropping patterns
 - Vite + React starter for the project scaffold
