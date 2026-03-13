@@ -19,10 +19,6 @@ Live demo: https://sayakaono.github.io/sliding-puzzle/
 
 ## Quick start
 
-Prerequisites
-- Node.js 18+ (recommended)
-- npm (or yarn/pnpm) — the repository uses npm in examples below
-
 Clone and install
 ```bash
 git clone https://github.com/SayakaOno/sliding-puzzle.git
@@ -34,28 +30,12 @@ Run dev server
 ```bash
 npm run dev
 ```
-Open the URL printed by Vite (usually http://localhost:5173).
-
-Build for production
-```bash
-npm run build
-```
-
-Preview production build locally
-```bash
-npm run preview
-```
-
-Lint
-```bash
-npm run lint
-```
 
 ## How to use
 
 1. Open the app in your browser.
 2. Select a grid size from the selector (default is 3x3).
-3. Upload an image (or use the sample if provided).
+3. Upload an image.
 4. Use the crop UI to select the portion of the image you want used for the puzzle.
    - A preview canvas displays the crop.
 5. Click "Start Game" to generate the puzzle from the cropped image.
@@ -71,13 +51,9 @@ Notes:
   - components/
     - ImageSetup — image upload + cropping UI and preview canvas
     - Game — game logic and tile rendering
-  - App.tsx — app shell and state for grid size / play mode
-  - main.tsx, CSS files, and type definitions
-- index.html, vite.config.ts, tsconfig*.json
-- package.json — dependencies & scripts
 
 Key dependencies
-- react, react-dom (React 19)
+- react, react-dom
 - typescript
 - vite
 - react-image-crop (image cropping)
